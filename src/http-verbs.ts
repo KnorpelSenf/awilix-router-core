@@ -10,7 +10,7 @@ export type HttpVerb =
   | 'CONNECT'
   | 'OPTIONS'
   | 'PATCH'
-  | '*'
+  | '*';
 
 /**
  * Http methods.
@@ -24,5 +24,5 @@ export const HttpVerbs: Record<string, HttpVerb> = {
   CONNECT: 'CONNECT',
   OPTIONS: 'OPTIONS',
   PATCH: 'PATCH',
-  ALL: '*'
-}
+  ALL: '*',
+};

@@ -1,24 +1,24 @@
-import { HttpVerb } from './http-verbs'
-import { uniq } from './util'
-import { STATE, IS_CONTROLLER_BUILDER } from './symbols'
-import { IAwilixControllerBuilder } from './controller'
+import { HttpVerb } from './http-verbs.ts';
+import { uniq } from './util.ts';
+import { IS_CONTROLLER_BUILDER, STATE } from './symbols.ts';
+import { IAwilixControllerBuilder } from './controller.ts';
 
 /**
  * Middleware decorator parameter.
  */
-export type MiddlewareParameter = Array<any> | any
+export type MiddlewareParameter = Array<any> | any;
 
 /**
  * Function that returns T.
  */
-export type FunctionReturning<T = any> = (...args: Array<any>) => T
+export type FunctionReturning<T = any> = (...args: Array<any>) => T;
 
 /**
  * A class or function returning T.
  */
 export type ClassOrFunctionReturning<T = any> =
   | FunctionReturning<T>
-  | Constructor<T>
+  | Constructor<T>;
 
 /**
  * A class constructor. For example:
@@ -28,7 +28,7 @@ export type ClassOrFunctionReturning<T = any> =
  *    MyClass
  *    ^^^^^^^
  */
-export type Constructor<T = any> = { new (...args: any[]): T }
+export type Constructor<T = any> = { new (...args: any[]): T };
 
 /**
  * Target to instantiate and it's router state.
@@ -37,11 +37,11 @@ export interface IStateAndTarget {
   /**
    * The target to call.
    */
-  target: Constructor | Function
+  target: Constructor | Function;
   /**
    * Routing state to configure.
    */
-  state: IRouterConfigState
+  state: IRouterConfigState;
 }
 
 /**
@@ -51,11 +51,11 @@ export interface IRouterConfigState {
   /**
    * Root config (class-level).
    */
-  root: IRouteConfig
+  root: IRouteConfig;
   /**
    * Method configs (method-level).
    */
-  methods: Map<MethodName, IRouteConfig>
+  methods: Map<MethodName, IRouteConfig>;
 }
 
 /**
@@ -65,25 +65,25 @@ export interface IRouteConfig {
   /**
    * Paths to register.
    */
-  paths: Array<string>
+  paths: Array<string>;
   /**
    * Middleware to run before the method.
    */
-  beforeMiddleware: Array<any>
+  beforeMiddleware: Array<any>;
   /**
    * Middleware to run after the method.
    */
-  afterMiddleware: Array<any>
+  afterMiddleware: Array<any>;
   /**
    * HTTP verbs to register.
    */
-  verbs: Array<HttpVerb>
+  verbs: Array<HttpVerb>;
 }
 
 /**
  * Method name type.
  */
-export type MethodName = string | number | symbol | null
+export type MethodName = string | number | symbol | null;
 
 /**
  * Rolls up state so paths are joined, middleware rolled into
@@ -92,24 +92,24 @@ export type MethodName = string | number | symbol | null
  * @param state
  */
 export function rollUpState(
-  state: IRouterConfigState
+  state: IRouterConfigState,
 ): Map<MethodName, IRouteConfig> {
-  const result = new Map<MethodName, IRouteConfig>()
+  const result = new Map<MethodName, IRouteConfig>();
   state.methods.forEach((method, key) => {
     result.set(key, {
       paths: concatPaths(state.root.paths, method.paths),
       beforeMiddleware: [
         ...state.root.beforeMiddleware,
-        ...method.beforeMiddleware
+        ...method.beforeMiddleware,
       ],
       afterMiddleware: [
         ...method.afterMiddleware,
-        ...state.root.afterMiddleware
+        ...state.root.afterMiddleware,
       ],
-      verbs: method.verbs
-    })
-  })
-  return result
+      verbs: method.verbs,
+    });
+  });
+  return result;
 }
 
 /**
@@ -122,16 +122,16 @@ export function rollUpState(
  * @returns The normalized target + state, or `null` if not applicable.
  */
 export function getStateAndTarget(src: any): IStateAndTarget | null {
-  const state = getState(src)
+  const state = getState(src);
   if (!state) {
-    return null
+    return null;
   }
 
   const target = src[IS_CONTROLLER_BUILDER]
     ? (src as IAwilixControllerBuilder).target
-    : src
+    : src;
 
-  return { target, state }
+  return { target, state };
 }
 
 /**
@@ -144,12 +144,12 @@ export function getStateAndTarget(src: any): IStateAndTarget | null {
 export function addRoute(
   state: IRouterConfigState,
   methodName: MethodName,
-  path: string
+  path: string,
 ) {
-  const config = getOrCreateConfig(state, methodName)
+  const config = getOrCreateConfig(state, methodName);
   return updateConfig(state, methodName, {
-    paths: uniq([...config.paths, path])
-  })
+    paths: uniq([...config.paths, path]),
+  });
 }
 
 /**
@@ -162,12 +162,12 @@ export function addRoute(
 export function addBeforeMiddleware(
   state: IRouterConfigState,
   methodName: MethodName,
-  middleware: MiddlewareParameter
+  middleware: MiddlewareParameter,
 ) {
-  const config = getOrCreateConfig(state, methodName)
+  const config = getOrCreateConfig(state, methodName);
   return updateConfig(state, methodName, {
-    beforeMiddleware: addMiddleware(config.beforeMiddleware, middleware)
-  })
+    beforeMiddleware: addMiddleware(config.beforeMiddleware, middleware),
+  });
 }
 
 /**
@@ -180,12 +180,12 @@ export function addBeforeMiddleware(
 export function addAfterMiddleware(
   state: IRouterConfigState,
   methodName: MethodName,
-  middleware: MiddlewareParameter
+  middleware: MiddlewareParameter,
 ) {
-  const config = getOrCreateConfig(state, methodName)
+  const config = getOrCreateConfig(state, methodName);
   return updateConfig(state, methodName, {
-    afterMiddleware: addMiddleware(config.afterMiddleware, middleware)
-  })
+    afterMiddleware: addMiddleware(config.afterMiddleware, middleware),
+  });
 }
 
 /**
@@ -198,12 +198,12 @@ export function addAfterMiddleware(
 export function addHttpVerbs(
   state: IRouterConfigState,
   methodName: MethodName,
-  value: Array<HttpVerb>
+  value: Array<HttpVerb>,
 ) {
-  const config = getOrCreateConfig(state, methodName)
+  const config = getOrCreateConfig(state, methodName);
   return updateConfig(state, methodName, {
-    verbs: uniq([...config.verbs, ...value])
-  })
+    verbs: uniq([...config.verbs, ...value]),
+  });
 }
 
 /**
@@ -214,16 +214,17 @@ export function addHttpVerbs(
  */
 export function getOrCreateConfig(
   state: IRouterConfigState,
-  methodName: MethodName
+  methodName: MethodName,
 ) {
-  const config =
-    methodName === null ? state.root : state.methods.get(methodName)
+  const config = methodName === null
+    ? state.root
+    : state.methods.get(methodName);
 
   if (!config) {
-    return createRouteConfig()
+    return createRouteConfig();
   }
 
-  return config
+  return config;
 }
 
 /**
@@ -233,9 +234,10 @@ export function getOrCreateConfig(
  */
 export function getState(target: any): IRouterConfigState | null {
   return (
-    (target && (target.prototype ? target.prototype[STATE] : target[STATE])) ||
+    (target &&
+      (target.prototype ? target.prototype[STATE] : target[STATE])) ||
     null
-  )
+  );
 }
 
 /**
@@ -246,11 +248,11 @@ export function getState(target: any): IRouterConfigState | null {
  */
 export function setState(target: any, state: IRouterConfigState) {
   if (target.prototype) {
-    target.prototype[STATE] = state
+    target.prototype[STATE] = state;
   } else {
-    target[STATE] = state
+    target[STATE] = state;
   }
-  return state
+  return state;
 }
 
 /**
@@ -261,9 +263,9 @@ export function setState(target: any, state: IRouterConfigState) {
  */
 export function updateState(
   target: any,
-  updater: (state: IRouterConfigState) => IRouterConfigState
+  updater: (state: IRouterConfigState) => IRouterConfigState,
 ) {
-  setState(target, updater(getOrInitStateForDecoratorTarget(target)))
+  setState(target, updater(getOrInitStateForDecoratorTarget(target)));
 }
 
 /**
@@ -273,7 +275,7 @@ export function updateState(
  * @param name
  */
 export function getOrInitStateForDecoratorTarget(target: any) {
-  return getState(target) || createState()
+  return getState(target) || createState();
 }
 
 /**
@@ -282,9 +284,9 @@ export function getOrInitStateForDecoratorTarget(target: any) {
 export function createState(): IRouterConfigState {
   const state: IRouterConfigState = {
     root: createRouteConfig(),
-    methods: new Map<string, IRouteConfig>()
-  }
-  return state
+    methods: new Map<string, IRouteConfig>(),
+  };
+  return state;
 }
 
 /**
@@ -302,31 +304,31 @@ export function createState(): IRouterConfigState {
 export function updateConfig(
   state: IRouterConfigState,
   methodName: MethodName,
-  newConfig: Partial<IRouteConfig>
+  newConfig: Partial<IRouteConfig>,
 ): IRouterConfigState {
-  const existing = getOrCreateConfig(state, methodName)
+  const existing = getOrCreateConfig(state, methodName);
   const mergedConfig: IRouteConfig = {
     ...existing,
-    ...newConfig
-  }
+    ...newConfig,
+  };
 
   // Root update is simple.
   if (methodName === null) {
     return {
       ...state,
-      root: mergedConfig
-    }
+      root: mergedConfig,
+    };
   }
 
   // Filters out the entry we're replacing.
   const filteredEntries = Array.from(state.methods.entries()).filter(
-    ([key]) => key !== methodName
-  )
+    ([key]) => key !== methodName,
+  );
 
   return {
     ...state,
-    methods: new Map([...filteredEntries, [methodName, mergedConfig]])
-  }
+    methods: new Map([...filteredEntries, [methodName, mergedConfig]]),
+  };
 }
 
 /**
@@ -337,8 +339,8 @@ export function createRouteConfig(): IRouteConfig {
     paths: [],
     beforeMiddleware: [],
     afterMiddleware: [],
-    verbs: []
-  }
+    verbs: [],
+  };
 }
 
 /**
@@ -350,7 +352,7 @@ export function createRouteConfig(): IRouteConfig {
 function addMiddleware(targetArray: Array<any>, value: MiddlewareParameter) {
   return Array.isArray(value)
     ? [...targetArray, ...value]
-    : [...targetArray, value]
+    : [...targetArray, value];
 }
 
 /**
@@ -358,19 +360,19 @@ function addMiddleware(targetArray: Array<any>, value: MiddlewareParameter) {
  */
 function concatPaths(rootPaths: Array<string>, methodPaths: Array<string>) {
   if (rootPaths.length === 0) {
-    return [...methodPaths]
+    return [...methodPaths];
   }
 
-  const result: Array<string> = []
-  rootPaths.forEach(rootPath => {
+  const result: Array<string> = [];
+  rootPaths.forEach((rootPath) => {
     if (methodPaths.length === 0) {
-      result.push(rootPath)
+      result.push(rootPath);
     } else {
-      methodPaths.forEach(methodPath => {
-        result.push(rootPath + methodPath)
-      })
+      methodPaths.forEach((methodPath) => {
+        result.push(rootPath + methodPath);
+      });
     }
-  })
+  });
 
-  return result
+  return result;
 }

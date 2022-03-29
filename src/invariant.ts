@@ -6,11 +6,11 @@
  */
 export function invariant<T>(
   condition: T | undefined | null,
-  message: string
+  message: string,
 ): T | never {
   if (!condition) {
-    throw new Error(message)
+    throw new Error(message);
   }
 
-  return condition
+  return condition;
 }

@@ -1,1 +1,1 @@
-module.exports.test = 'not matched'
+module.exports.test = 'not matched';

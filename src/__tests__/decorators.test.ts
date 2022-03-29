@@ -1,20 +1,20 @@
 import {
-  route,
-  before,
   after,
-  verbs,
+  ALL,
+  before,
+  CONNECT,
+  DELETE,
   GET,
-  PATCH,
   HEAD,
   OPTIONS,
-  CONNECT,
-  PUT,
+  PATCH,
   POST,
-  DELETE,
-  ALL
-} from '../decorators'
-import { HttpVerbs } from '../http-verbs'
-import { getState } from '../state-util'
+  PUT,
+  route,
+  verbs,
+} from '../decorators';
+import { HttpVerbs } from '../http-verbs';
+import { getState } from '../state-util';
 
 describe('router decorator', () => {
   describe('on class', () => {
@@ -22,10 +22,10 @@ describe('router decorator', () => {
       @route('/test')
       class Test {}
 
-      const state = getState(Test)!
-      expect(state.root.paths).toEqual(['/test'])
-    })
-  })
+      const state = getState(Test)!;
+      expect(state.root.paths).toEqual(['/test']);
+    });
+  });
 
   describe('on method', () => {
     it('sets the path on the method config', () => {
@@ -38,11 +38,11 @@ describe('router decorator', () => {
         }
       }
 
-      const config = getState(Test)!.methods.get('wee')!
-      expect(config.paths).toEqual(['/test', '/overriden'])
-    })
-  })
-})
+      const config = getState(Test)!.methods.get('wee')!;
+      expect(config.paths).toEqual(['/test', '/overriden']);
+    });
+  });
+});
 
 describe('before and after middleware', () => {
   @before(['rootBefore3', 'rootBefore4'])
@@ -62,7 +62,7 @@ describe('before and after middleware', () => {
     }
   }
 
-  const state = getState(Test)!
+  const state = getState(Test)!;
 
   describe('on class', () => {
     it('sets the middlewares on the root', () => {
@@ -70,24 +70,27 @@ describe('before and after middleware', () => {
         'rootBefore1',
         'rootBefore2',
         'rootBefore3',
-        'rootBefore4'
-      ])
+        'rootBefore4',
+      ]);
 
-      expect(state.root.afterMiddleware).toEqual(['rootAfter1', 'rootAfter2'])
-    })
-  })
+      expect(state.root.afterMiddleware).toEqual([
+        'rootAfter1',
+        'rootAfter2',
+      ]);
+    });
+  });
 
   describe('on method', () => {
     it('sets the middlewares on the methods', () => {
-      const m1 = state.methods.get('m1')!
-      const m2 = state.methods.get('m2')!
-      expect(m1.beforeMiddleware).toEqual(['m1Before1', 'm1Before2'])
-      expect(m2.beforeMiddleware).toEqual(['m2Before1', 'm2Before2'])
-      expect(m1.afterMiddleware).toEqual(['m1After1', 'm1After2'])
-      expect(m2.afterMiddleware).toEqual(['m2After1', 'm2After2'])
-    })
-  })
-})
+      const m1 = state.methods.get('m1')!;
+      const m2 = state.methods.get('m2')!;
+      expect(m1.beforeMiddleware).toEqual(['m1Before1', 'm1Before2']);
+      expect(m2.beforeMiddleware).toEqual(['m2Before1', 'm2Before2']);
+      expect(m1.afterMiddleware).toEqual(['m1After1', 'm1After2']);
+      expect(m2.afterMiddleware).toEqual(['m2After1', 'm2After2']);
+    });
+  });
+});
 
 describe('methods decorator', () => {
   describe('on class', () => {
@@ -95,15 +98,15 @@ describe('methods decorator', () => {
       expect(() => {
         @verbs([HttpVerbs.GET])
         class Test {}
-        return new Test()
-      }).toThrowError(/verbs/)
+        return new Test();
+      }).toThrowError(/verbs/);
       expect(() => {
         @GET()
         class Test {}
-        return new Test()
-      }).toThrowError(/verbs/)
-    })
-  })
+        return new Test();
+      }).toThrowError(/verbs/);
+    });
+  });
 
   describe('on methods', () => {
     it('adds the http method', () => {
@@ -124,8 +127,8 @@ describe('methods decorator', () => {
         }
       }
 
-      const state = getState(Test)!
-      const wee = state.methods.get('wee')!
+      const state = getState(Test)!;
+      const wee = state.methods.get('wee')!;
       expect(wee.verbs).toEqual([
         HttpVerbs.ALL,
         HttpVerbs.DELETE,
@@ -135,9 +138,9 @@ describe('methods decorator', () => {
         HttpVerbs.HEAD,
         HttpVerbs.PATCH,
         HttpVerbs.PUT,
-        HttpVerbs.POST
-      ])
-      expect(wee.paths).toEqual(['/save'])
-    })
-  })
-})
+        HttpVerbs.POST,
+      ]);
+      expect(wee.paths).toEqual(['/save']);
+    });
+  });
+});

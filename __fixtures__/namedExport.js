@@ -1,5 +1,5 @@
-const { createController } = require('../src/controller')
+const { createController } = require('../src/controller');
 
 class NamedExportClass {}
-NamedExportClass.isNamedExport = true
-module.exports.NamedExportClass = createController(NamedExportClass)
+NamedExportClass.isNamedExport = true;
+module.exports.NamedExportClass = createController(NamedExportClass);

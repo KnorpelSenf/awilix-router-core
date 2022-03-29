@@ -1,23 +1,23 @@
 import {
-  MiddlewareParameter,
-  createState,
+  addAfterMiddleware,
+  addBeforeMiddleware,
   addHttpVerbs,
   addRoute,
-  addBeforeMiddleware,
+  ClassOrFunctionReturning,
   Constructor,
+  createState,
   IRouterConfigState,
-  addAfterMiddleware,
-  ClassOrFunctionReturning
-} from './state-util'
-import { HttpVerbs, HttpVerb } from './http-verbs'
-import { STATE, IS_CONTROLLER_BUILDER } from './symbols'
+  MiddlewareParameter,
+} from './state-util.ts';
+import { HttpVerb, HttpVerbs } from './http-verbs.ts';
+import { IS_CONTROLLER_BUILDER, STATE } from './symbols.ts';
 
 /**
  * Method builder options.
  */
 export interface IMethodBuilderOpts {
-  before?: MiddlewareParameter
-  after?: MiddlewareParameter
+  before?: MiddlewareParameter;
+  after?: MiddlewareParameter;
 }
 
 /**
@@ -26,34 +26,34 @@ export interface IMethodBuilderOpts {
 export type VerbBuilderFunction<T = any> = (
   path: string,
   method: keyof T,
-  opts?: IMethodBuilderOpts
-) => IAwilixControllerBuilder<T>
+  opts?: IMethodBuilderOpts,
+) => IAwilixControllerBuilder<T>;
 
 /**
  * Fluid router builder.
  */
 export interface IAwilixControllerBuilder<T = any> {
-  [STATE]: IRouterConfigState
-  [IS_CONTROLLER_BUILDER]: boolean
-  target: Constructor | Function
-  get: VerbBuilderFunction<T>
-  post: VerbBuilderFunction<T>
-  put: VerbBuilderFunction<T>
-  patch: VerbBuilderFunction<T>
-  delete: VerbBuilderFunction<T>
-  head: VerbBuilderFunction<T>
-  options: VerbBuilderFunction<T>
-  connect: VerbBuilderFunction<T>
-  all: VerbBuilderFunction<T>
+  [STATE]: IRouterConfigState;
+  [IS_CONTROLLER_BUILDER]: boolean;
+  target: Constructor | Function;
+  get: VerbBuilderFunction<T>;
+  post: VerbBuilderFunction<T>;
+  put: VerbBuilderFunction<T>;
+  patch: VerbBuilderFunction<T>;
+  delete: VerbBuilderFunction<T>;
+  head: VerbBuilderFunction<T>;
+  options: VerbBuilderFunction<T>;
+  connect: VerbBuilderFunction<T>;
+  all: VerbBuilderFunction<T>;
   verbs(
     verbs: Array<HttpVerb>,
     path: string,
     method: keyof T,
-    opts?: IMethodBuilderOpts
-  ): this
-  prefix(path: string): this
-  before(value: MiddlewareParameter): this
-  after(value: MiddlewareParameter): this
+    opts?: IMethodBuilderOpts,
+  ): this;
+  prefix(path: string): this;
+  before(value: MiddlewareParameter): this;
+  after(value: MiddlewareParameter): this;
 }
 
 /**
@@ -77,9 +77,9 @@ export interface IAwilixControllerBuilder<T = any> {
  *     })
  */
 export function createController<T = any>(
-  ClassOrFunction: ClassOrFunctionReturning<T>
+  ClassOrFunction: ClassOrFunctionReturning<T>,
 ): IAwilixControllerBuilder<T> {
-  return createControllerFromState(ClassOrFunction, createState())
+  return createControllerFromState(ClassOrFunction, createState());
 }
 
 /**
@@ -91,7 +91,7 @@ export function createController<T = any>(
  */
 export function createControllerFromState(
   ClassOrFunction: Constructor | Function,
-  state: IRouterConfigState
+  state: IRouterConfigState,
 ) {
   const builder: IAwilixControllerBuilder = {
     [STATE]: state,
@@ -109,39 +109,39 @@ export function createControllerFromState(
     prefix(path) {
       return createControllerFromState(
         ClassOrFunction,
-        addRoute(state, null, path)
-      )
+        addRoute(state, null, path),
+      );
     },
     before(middleware) {
       return createControllerFromState(
         ClassOrFunction,
-        addBeforeMiddleware(state, null, middleware)
-      )
+        addBeforeMiddleware(state, null, middleware),
+      );
     },
     after(middleware) {
       return createControllerFromState(
         ClassOrFunction,
-        addAfterMiddleware(state, null, middleware)
-      )
+        addAfterMiddleware(state, null, middleware),
+      );
     },
     verbs(verbs, path, method, opts) {
-      state = addRoute(state, method, path)
-      state = addHttpVerbs(state, method, verbs)
+      state = addRoute(state, method, path);
+      state = addHttpVerbs(state, method, verbs);
       if (opts) {
         if (opts.before) {
-          state = addBeforeMiddleware(state, method, opts.before)
+          state = addBeforeMiddleware(state, method, opts.before);
         }
 
         if (opts.after) {
-          state = addAfterMiddleware(state, method, opts.after)
+          state = addAfterMiddleware(state, method, opts.after);
         }
       }
 
-      return createControllerFromState(ClassOrFunction, state)
-    }
-  }
+      return createControllerFromState(ClassOrFunction, state);
+    },
+  };
 
-  return builder
+  return builder;
 
   /**
    * Creates a preconfigured verb function.
@@ -150,7 +150,7 @@ export function createControllerFromState(
    */
   function createVerbFunction(verb: HttpVerb): VerbBuilderFunction {
     return function configureRoute(path, method, opts) {
-      return builder.verbs([verb], path, method, opts)
-    }
+      return builder.verbs([verb], path, method, opts);
+    };
   }
 }
